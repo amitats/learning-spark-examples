@@ -31,7 +31,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - name: Build and analyze
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Neeeeded to get PR information, if any
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Neeeeeeded to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: sonar-scanner -Dsonar.projectKey=mypythonproject -Dsonar.sources=. -Dsonar.host.url=http://3.122.228.200:9000 -Dsonar.login=sqp_7693ae623b981cf597cb4592a9406c65512a991e
