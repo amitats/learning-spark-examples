@@ -1,37 +1,24 @@
-name: Build
-on:
-  push:
-    branches:
-      - master # the name of your main branch
-  pull_request:
-    types: [opened, synchronize, reopened]
+on: push
+name: SonarQube Workflow
 jobs:
-  build:
-    name: Build
+  sonarqube:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-      - name: Cache SonarQube packages
-        uses: actions/cache@v1
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-      - name: Cache Maven packages
-        uses: actions/cache@v1
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
-      - name: Build and analyze
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Neeeeeeded to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: sonar-scanner -Dsonar.projectKey=mypythonproject -Dsonar.sources=. -Dsonar.host.url=http://3.122.228.200:9000 -Dsonar.login=sqp_7693ae623b981cf597cb4592a9406c65512a991e
+    - uses: actions/checkout@master
+      with:
+        fetch-depth: 0
+    # Setup java 17 to be default (sonar-scanner requirement as of 5.x)
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin' # See 'Supported distributions' for available options
+        java-version: '17'
+    # Setup sonar-scanner
+    - name: Setup SonarQube
+      uses: warchant/setup-sonar-scanner@v7
+    # Run sonar-scanner
+    - name: SonarQube Scan
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Neeeeded to get PR information, if any
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      run: sonar-scanner -Dsonar.projectKey=mypythonproject -Dsonar.sources=. -Dsonar.host.url=http://3.122.228.200:9000 -Dsonar.login=sqp_7693ae623b981cf597cb4592a9406c65512a991e
